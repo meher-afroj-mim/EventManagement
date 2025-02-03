@@ -18,7 +18,7 @@ public class EventManagement extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FXMLDocument.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("event_management.fxml"));
         
         Scene scene = new Scene(root);
         
