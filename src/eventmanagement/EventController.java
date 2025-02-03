@@ -4,65 +4,99 @@
  */
 package eventmanagement;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 
-/**
- * FXML Controller class
- *
- * @author USER
- */
-public class EventController implements Initializable {
+import java.sql.SQLException;
+import java.time.LocalDate;
 
-    @FXML
-    private TableView<?> eventTable;
-    @FXML
-    private TableColumn<?, ?> idColumn;
-    @FXML
-    private TableColumn<?, ?> nameColumn;
-    @FXML
-    private TableColumn<?, ?> dateColumn;
-    @FXML
-    private TableColumn<?, ?> locationColumn;
-    @FXML
-    private TextField nameField;
-    @FXML
-    private DatePicker datePicker;
-    @FXML
-    private TextField locationField;
-    @FXML
-    private Button saveButton;
-    @FXML
-    private Button updateButton;
-    @FXML
-    private Button deleteButton;
+public class EventController {
+    @FXML private TableView<Event> eventTable;
+    @FXML private TableColumn<Event, Integer> idColumn;
+    @FXML private TableColumn<Event, String> nameColumn;
+    @FXML private TableColumn<Event, LocalDate> dateColumn;
+    @FXML private TableColumn<Event, String> locationColumn;
 
-    /**
-     * Initializes the controller class.
-     */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
+    @FXML private TextField nameField;
+    @FXML private DatePicker datePicker;
+    @FXML private TextField locationField;
+
+    private ObservableList<Event> eventList = FXCollections.observableArrayList();
 
     @FXML
-    private void saveEvent(ActionEvent event) {
+    public void initialize() {
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("eventName"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("eventDate"));
+        locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
+
+        try {
+            eventList.addAll(DatabaseUtil.getAllEvents());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        eventTable.setItems(eventList);
     }
 
     @FXML
-    private void updateEvent(ActionEvent event) {
+    private void saveEvent() {
+        String eventName = nameField.getText();
+        LocalDate eventDate = datePicker.getValue();
+        String location = locationField.getText();
+
+        if (eventName != null && eventDate != null && location != null) {
+            Event event = new Event(0, eventName, eventDate, location);
+            try {
+                DatabaseUtil.saveEvent(event);
+                eventList.add(event);
+                clearFields();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
-    private void deleteEvent(ActionEvent event) {
+    private void updateEvent() {
+        Event selectedEvent = eventTable.getSelectionModel().getSelectedItem();
+        if (selectedEvent != null) {
+            selectedEvent.setEventName(nameField.getText());
+            selectedEvent.setEventDate(datePicker.getValue());
+            selectedEvent.setLocation(locationField.getText());
+
+            try {
+                DatabaseUtil.updateEvent(selectedEvent);
+                eventTable.refresh();
+                clearFields();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
-    
+
+    @FXML
+    private void deleteEvent() {
+        Event selectedEvent = eventTable.getSelectionModel().getSelectedItem();
+        if (selectedEvent != null) {
+            try {
+                DatabaseUtil.deleteEvent(selectedEvent.getId());
+                eventList.remove(selectedEvent);
+                clearFields();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void clearFields() {
+        nameField.clear();
+        datePicker.setValue(null);
+        locationField.clear();
+    }
 }
