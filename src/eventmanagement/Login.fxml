@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="279.0" prefWidth="500" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="eventmanagement.LoginController">
+
+    <VBox alignment="CENTER" layoutX="100" layoutY="80" prefWidth="300" spacing="15">
+        <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Login" />
+        
+        <TextField fx:id="usernameField" prefWidth="250" promptText="Username" />
+        
+        <PasswordField fx:id="passwordField" prefWidth="250" promptText="Password" />
+        
+        <Button fx:id="loginButton" onAction="#handleLogin" style="-fx-background-color: #0078D7; -fx-text-fill: white; -fx-font-size: 14px;" text="Login" />
+    </VBox>
+</AnchorPane>
